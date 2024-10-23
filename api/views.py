@@ -5,6 +5,10 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django_filters.rest_framework import DjangoFilterBackend
 from .services.nutritionix import NutritionixService
 from datetime import datetime
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny
+from django.contrib.auth.models import User
+from .serializer import UserSerializer, MealSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
@@ -16,9 +20,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return User.objects.filter(id=self.request.user.id)
 
     def get_permissions(self):
+        
         if self.action == 'create':
-            return []
-        return [IsAuthenticated()]
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     @action(detail=False, methods=['get'])
     def me(self, request):
