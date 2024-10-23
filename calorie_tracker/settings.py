@@ -11,7 +11,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-
+import os
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,10 +25,16 @@ SECRET_KEY = "django-insecure-&92oph_w0r-osl!54x!b&c-oxj-metzg9js-u-t9h$a($bt@-)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5000",  # React default port
+    "http://127.0.0.1:5000",
+]
 
-ALLOWED_HOSTS = []
+CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:5000","http://127.0.0.1:5000"]
+# Update allowed hosts
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
 
 
 # Application definition
@@ -39,17 +46,18 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",  # Add DRF
-    "corsheaders",    # Add CORS
-    "api",           # Add our api app
-]
+    "rest_framework",  
+    "corsheaders", 
+    "django_filters",   
+    "api",           
+    ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware", 
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "corsheaders.middleware.CorsMiddleware", 
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
@@ -105,8 +113,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
+
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': True,
+}
+
 # REST Framework
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
@@ -127,6 +149,10 @@ USE_I18N = True
 
 USE_TZ = True
 
+
+
+NUTRITIONIX_API_KEY = os.getenv('NUTRITIONIX_API_KEY')
+NUTRITIONIX_APP_ID = os.getenv('NUTRITIONIX_APP_ID')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
