@@ -18,7 +18,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if self.request.user.is_staff:
             return User.objects.all()
         return User.objects.filter(id=self.request.user.id)
-
+    
     def get_permissions(self):
         
         if self.action == 'create':
